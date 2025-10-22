@@ -1,0 +1,251 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
+/* Importa la fuente Quicksand de Google Fonts. */
+
+*,
+::before,
+::after {
+    box-sizing: border-box;
+    /* Asegura que el padding y borde se incluyan en el tamaño total de cada elemento. */
+}
+body {
+    font-family: "Quicksand", sans-serif; /* Aplica la fuente Quicksand a todo el texto. */
+    background: linear-gradient(to bottom right, #ffecec, #fff5f5, #ffebeb); /* Fondo en degradado rosado claro. */
+    color: #333; /* Color de texto por defecto. */
+    display: flex; /* Centra todo el contenido en la pantalla. */
+    justify-content: center;
+    align-items: center;
+    min-height: 120vh; /* Ocupa toda la altura de la ventana. */
+    margin: 0;
+    padding: 1rem;
+    margin-top: 50px;
+    overflow: hidden; /* Evita barras de desplazamiento. */
+    -webkit-tap-highlight-color: transparent; /* Quita el brillo azul en móviles. */
+}
+
+/* CONFIGURACIÓN DEL SOBRE (Envelope) */
+.envelope {
+    --duration: 1000ms; /* Duración general de las animaciones (1 segundo). */
+
+    /* Variables para el sombreado y colores. */
+    --shadow-width: calc(var(--envelope-width) * 0.85);
+    --shadow-blur: 15px;
+
+    /* Tamaños del sobre */
+    --envelope-width: 300px;
+    --envelope-height: 175px;
+
+    /* Colores del sobre */
+    --envelope-clr-bg: #d14d44; /* Color frontal rojo-rosado. */
+    --envelope-clr-bg-side: #c24e46; /* Lados más oscuros. */
+    --envelope-clr-bg-bottom: #e15349; /* Parte inferior más viva. */
+    --envelope-clr-bg-top: #d14d44;
+    --envelope-clr-txt: #fff; /* Texto blanco. */
+
+    /* Transformaciones y estados. */
+    --envelope-transform: rotateY(0deg); /* Estado cerrado. */
+    --envelope-transform-hover: rotateY(180deg); /* Estado abierto (volteado). */
+
+    /* Retrasos de animación */
+    --evelope-rotate-delay: calc(var(--duration) / 1);
+    --evelope-rotate-delay-hover: 0ms;
+
+    /* Colores y tamaños de la carta interna */
+    --letter-clr-bg: #fff;
+    --letter-clr-text: #c0392b;
+    --letter-font-size: 1rem;
+    --letter-delay: 0ms;
+    --letter-delay-hover: calc(var(--duration) * 1.25);
+
+    /* Altura de la carta (antes y después de abrir). */
+    --letter-height: calc(var(--envelope-height) - 2rem);
+    --letter-height-hover: calc(var(--envelope-height) * 1.85);
+
+    /* Configuración del pliegue superior del sobre. */
+    --fold-rotate: rotateX(0deg);
+    --fold-zindex: 10;
+    --fold-zindex-hover: 0;
+    --fold-rotate-hover: rotateX(180deg);
+    --fold-delay: calc(var(--duration) / 2);
+    --fold-delay-hover: calc(var(--duration) * .75);
+
+    --front-font-size: 1rem;
+
+    position: relative;
+    height: var(--envelope-height);
+    width: var(--envelope-width);
+    perspective: 1000px; /* Da profundidad 3D al sobre. */
+    cursor: pointer; /* El sobre se puede clicar. */
+}
+
+/* Cuando la pantalla es grande, aumenta el tamaño del sobre y el texto */
+@media (min-width: 720px) {
+    .envelope {
+        --envelope-width: 600px;
+        --envelope-height: 350px;
+        --letter-font-size: 1.6rem;
+        --front-font-size: 1.25rem;
+    }
+}
+
+/* SOMBRA DEBAJO DEL SOBRE */
+.envelope::after {
+    content: "";
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    width: var(--shadow-width);
+    height: 40px;
+    transition: var(--duration) ease-in-out;
+    transform: var(--shadow-transform);
+    translate: -50% 0;
+    border-radius: 50%;
+    background: rgba(56,6,6,0.4);
+    filter: blur(var(--shadow-blur));
+}
+
+/* Efecto de apertura: se activa tanto al pasar el mouse como al hacer click (.open) */
+.envelope:hover,
+.envelope.open {
+    --envelope-transform: var(--envelope-transform-hover, 0deg);
+    --evelope-rotate-delay: var(--evelope-rotate-delay-hover);
+    --shadow-transform: rotateY(180deg);
+    --fold-rotate: var(--fold-rotate-hover);
+    --fold-delay: var(--fold-delay-hover);
+    --fold-zindex: var(--fold-zindex-hover);
+    --letter-height: var(--letter-height-hover);
+    --letter-delay: var(--letter-delay-hover);
+}
+
+/* CONTENEDOR INTERIOR DEL SOBRE */
+.envelope-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: var(--duration) ease-in-out;
+    transition-delay: var(--evelope-rotate-delay);
+    transform-style: preserve-3d;
+    transform: var(--envelope-transform);
+    display: grid;
+}
+
+/* Lados del sobre (frontal y trasero) */
+.envelope-front,
+.envelope-back {
+    position: relative;
+    grid-area: 1/1;
+    width: 100%;
+    height: 100%;
+    background-color: var(--envelope-clr-bg);
+    backface-visibility: hidden; /* Oculta el reverso al girar. */
+    perspective: 1000px;
+    isolation: isolate;
+}
+
+.envelope-front {
+    color: var(--envelope-clr-txt);
+    display: grid;
+    place-content: center;
+}
+
+.envelope-front .postage-stamp {
+    position: absolute;
+    top: 1em;
+    right: 0.5em;
+    width: 15%; /* Tamaño de la estampilla */
+}
+.envelope-front .address {
+    text-align: left;
+    font-size: var(--front-font-size);
+}
+.envelope-front .address > p > span:first-child {
+    font-family: system-ui;
+    font-weight: 200; /* “Para:” y “De:” más finos */
+}
+.envelope-front .address > p > span:last-of-type {
+    font-weight: 800; /* Nombres resaltados */
+}
+
+/* La parte trasera del sobre está inicialmente girada */
+.envelope-back {
+    transform: rotateY(180deg);
+}
+
+/* Colores del reverso del sobre */
+.envelope-back::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background-image: conic-gradient(
+        transparent 60deg,
+        var(--envelope-clr-bg-side) 60deg 120deg,
+        var(--envelope-clr-bg-bottom) 120deg 240deg,
+        var(--envelope-clr-bg-side) 240deg 300deg,
+        transparent 300deg
+    );
+}
+
+/* Solapa superior del sobre, se pliega al abrir */
+.envelope-back .top-fold {
+    position: absolute;
+    inset: 0;
+    z-index: var(--fold-zindex, 10);
+    background-color: var(--envelope-clr-bg-top);
+    clip-path: polygon(0% 0%, 50% 55%, 100% 0%);
+    transform: var(--fold-rotate);
+    transform-origin: top;
+    transition: var(--duration) ease-in-out;
+    transition-delay: var(--fold-delay);
+}
+
+/* LA CARTA INTERIOR */
+.letter {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    width: 90%;
+    height: var(--letter-height);
+    font-size: var(--letter-font-size);
+    transform: translateX(-50%);
+    background: var(--letter-clr-bg);
+    z-index: 2;
+    padding: 2em 3em;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Espaciado entre los elementos internos */
+    align-items: center;
+    text-align: center;
+    transition: var(--duration) ease-in-out;
+    overflow: hidden;
+}
+
+/* Imagen del mite y oreo */
+.custom-imagemiteoreo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain; /* Encaja sin deformarse */
+    margin-bottom: 0.4em; /* Menos espacio debajo */
+}
+/* Imagen de la flor */
+.custom-image {
+    width: 50px;
+    height: 50px;
+    object-fit: contain; /* Encaja sin deformarse */
+    margin-bottom: 0.4em; /* Menos espacio debajo */
+}
+
+/* TEXTO DE LA CARTA más pequeño y más junto */
+.letter h3,
+.letter p {
+    font-size: 0.79em; /* Tamaño algo más pequeño */
+    margin: 0.15em 0; /* Muy poco espacio vertical */
+    color: #c0392b;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.2; /* Líneas más pegadas */
+}
+.letter h3 {
+    font-size: 1.08em; /* El título un poco más grande */
+    margin-top: 0.1em;
+    margin-bottom: 0.15em;
+}
